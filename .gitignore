@@ -1,0 +1,25 @@
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local Database & Dynamic Data
+data/attendance.db
+data/employees/*
+data/visitors/*
+!data/employees/.gitkeep
+!data/visitors/.gitkeep
+
+# IDE Settings
+.vscode/
+.idea/
+
+# OS Files
+Thumbs.db
+.DS_Store

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Live Attendance</h1>
+<p class="muted">
+  Opens phone Camo camera, recognizes registered employees, and marks IN/OUT automatically.
+</p>
+
+<div class="card">
+  <p><b>Before starting:</b></p>
+  <ol>
+    <li>Camo Studio must be open and phone connected</li>
+    <li>At least 1 employee must be added with Capture</li>
+    <li>Press <b>Q</b> in the camera window to stop</li>
+  </ol>
+  <p class="muted">Rule: IN is marked on first detection. OUT is set only 2 minutes after IN, then keeps updating.</p>
+  <a class="btn" href="{{ url_for('live_attendance_start') }}">▶ Start Live Attendance</a>
+</div>
+{% endblock %}

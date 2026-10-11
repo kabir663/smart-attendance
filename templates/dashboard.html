@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="padding: 20px; max-width: 1200px; margin: auto;">
+        
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="color: white;">🏢 Enterprise Occupancy Dashboard</h2>
+        <a href="{{ url_for('live_attendance_start') }}" style="display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">🔴 Start Live Attendance</a>
+    </div>
+
+    <!-- Occupancy Stats -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h3 style="margin: 0; color: #555; font-size: 14px; text-transform: uppercase;">Registered Employees</h3>
+            <h1 style="margin: 10px 0 0; font-size: 36px; color: #222;">{{ total_employees }}</h1>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-left: 5px solid #28a745;">
+            <h3 style="margin: 0; color: #555; font-size: 14px; text-transform: uppercase;">Employees Inside</h3>
+            <h1 style="margin: 10px 0 0; font-size: 36px; color: #222;">{{ employees_inside }}</h1>
+            <small style="color:gray;">Out of Office: {{ employees_outside }}</small>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-left: 5px solid #dc3545;">
+            <h3 style="margin: 0; color: #555; font-size: 14px; text-transform: uppercase;">Unknown Visitors Inside</h3>
+            <h1 style="margin: 10px 0 0; font-size: 36px; color: #dc3545;">{{ visitors_inside }}</h1>
+            <small style="color:gray;">Faces Captured</small>
+        </div>
+        <div style="background: #eef5ff; padding: 20px; border-radius: 10px; text-align: center; border-left: 5px solid #007bff;">
+            <h3 style="margin: 0; color: #555; font-size: 14px; text-transform: uppercase;">TOTAL OCCUPANCY</h3>
+            <h1 style="margin: 10px 0 0; font-size: 36px; color: #007bff;">{{ total_occupancy }}</h1>
+            <small style="color:red; font-weight:bold;">🔥 Evacuation Target Count</small>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px;">
+        <!-- Emergency Evacuation Roster -->
+        <div style="flex: 1; background: white; padding: 20px; border-radius: 10px; border: 2px solid #dc3545;">
+            <h3 style="color: #dc3545; margin-top:0;">🚨 Emergency Roster (Employees Inside)</h3>
+            <p style="font-size:12px; color:#666;">List of employees who have checked in but not checked out today.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; text-align: left; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">Emp ID</th>
+                        <th style="padding: 12px; text-align: left; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">Name</th>
+                        <th style="padding: 12px; text-align: left; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">Check-In Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in inside_list %}
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #ddd;">{{ emp.emp_id }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #ddd;"><strong>{{ emp.name }}</strong></td>
+                        <td style="padding: 12px; border-bottom: 1px solid #ddd;">{{ emp.in_time }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #888; padding: 12px;">No employees currently in building.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Standard Attendance Log -->
+        <div style="flex: 1; background: white; padding: 20px; border-radius: 10px;">
+            <h3 style="margin-top:0;">📋 Recent Activity Log</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; text-align: left; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">Name</th>
+                        <th style="padding: 12px; text-align: left; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">In Time</th>
+                        <th style="padding: 12px; text-align: left; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">Out Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in recent %}
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #ddd;">{{ rec.name }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #ddd; color:green;">{{ rec.in_time or '-' }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #ddd; color:orange;">{{ rec.out_time or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+:root {
+  --bg: #0f172a;
+  --panel: #111827;
+  --card: #1f2937;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --primary: #22c55e;
+  --danger: #ef4444;
+  --border: #334155;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Segoe UI, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 230px;
+  background: #020617;
+  padding: 20px;
+  border-right: 1px solid var(--border);
+}
+.sidebar h2 { margin: 0 0 20px; font-size: 20px; }
+.sidebar a {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.sidebar a:hover { background: #1e293b; }
+.content { flex: 1; padding: 24px; }
+.cards { display: flex; gap: 16px; margin: 16px 0 24px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 180px;
+}
+.big { font-size: 28px; margin: 8px 0 0; font-weight: 700; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border-radius: 12px;
+  overflow: hidden;
+}
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+  text-align: left;
+}
+th { background: #0b1220; }
+.btn {
+  display: inline-block;
+  background: var(--primary);
+  color: #052e16;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn.secondary { background: #38bdf8; color: #082f49; }
+.btn.danger { background: var(--danger); color: white; }
+.form {
+  max-width: 520px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+label { display: block; margin: 10px 0 6px; color: var(--muted); }
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0b1220;
+  color: var(--text);
+}
+.actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.row-between { display: flex; justify-content: space-between; align-items: center; }
+.muted { color: var(--muted); }
+.alert {
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.alert.success { background: #14532d; }
+.alert.error { background: #7f1d1d; }

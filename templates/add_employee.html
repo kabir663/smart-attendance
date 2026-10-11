@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Add Employee</h1>
+<p class="muted">Fill details and click <b>Capture & Save</b>. Camera window will open from Camo.</p>
+
+<form method="POST" class="form">
+  <label>Employee ID</label>
+  <input type="text" name="emp_id" placeholder="EMP001" required />
+
+  <label>Full Name</label>
+  <input type="text" name="name" placeholder="John Doe" required />
+
+  <label>Age</label>
+  <input type="number" name="age" placeholder="24" min="1" max="100" />
+
+  <label>Department</label>
+  <input type="text" name="department" placeholder="IT / HR / Sales" />
+
+  <div class="actions">
+    <button class="btn" type="submit" name="action" value="capture_save">📷 Capture & Save</button>
+    <button class="btn secondary" type="submit" name="action" value="save_only">Save Without Photo</button>
+  </div>
+</form>
+{% endblock %}

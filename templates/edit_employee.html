@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row-between">
+  <h1>Edit Employee: {{ emp['name'] }}</h1>
+  <a href="{{ url_for('employees') }}" class="btn secondary">← Back to Employees</a>
+</div>
+
+<div style="display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap;">
+
+  <!-- Form Section -->
+  <form method="POST" class="form" style="flex: 1; min-width: 300px;">
+    <h3>Employee Information</h3>
+    
+    <label>Employee ID</label>
+    <input type="text" name="emp_id" value="{{ emp['emp_id'] }}" required />
+
+    <label>Full Name</label>
+    <input type="text" name="name" value="{{ emp['name'] }}" required />
+
+    <label>Age</label>
+    <input type="number" name="age" value="{{ emp['age'] or '' }}" min="1" max="100" />
+
+    <label>Department</label>
+    <input type="text" name="department" value="{{ emp['department'] or '' }}" />
+
+    <div class="actions">
+      <button class="btn" type="submit">💾 Save Changes</button>
+      <a href="{{ url_for('employees') }}" class="btn secondary">Cancel</a>
+    </div>
+  </form>
+
+  <!-- Face Photos Management Section -->
+  <div class="card" style="flex: 1; min-width: 320px; padding: 20px;">
+    <h3>Face Photos (Multi-Angle Training)</h3>
+    <p class="muted">Add photos from different angles (front, slight side view, with glasses) to improve AI accuracy.</p>
+
+    <div style="margin-bottom: 16px;">
+      <a href="{{ url_for('capture_existing', emp_pk=emp['id']) }}" class="btn">📷 Capture Additional Photo</a>
+    </div>
+
+    <h4>Stored Face Samples ({{ photos|length }}):</h4>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px;">
+      {% for p in photos %}
+      <div style="position: relative; text-align: center;">
+        <img src="{{ url_for('serve_employee_photo_file', emp_pk=emp['id'], filename=p) }}" 
+             style="width: 90px; height: 90px; object-fit: cover; border-radius: 8px; border: 2px solid #334155;">
+        <form method="POST" action="{{ url_for('delete_employee_photo', emp_pk=emp['id'], filename=p) }}" 
+              style="margin-top: 4px;" onsubmit="return confirm('Delete this photo sample?')">
+          <button type="submit" class="btn danger" style="padding: 2px 6px; font-size: 11px;">Remove</button>
+        </form>
+      </div>
+      {% else %}
+      <p class="muted">No face photos captured yet. Click the button above to scan face.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

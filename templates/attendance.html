@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Attendance Records</h1>
+<p class="muted">IN is marked on first detection. OUT updates only after 2 minutes.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Emp ID</th>
+      <th>Date</th>
+      <th>In Time</th>
+      <th>Out Time</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in records %}
+    <tr>
+      <td>{{ r['name'] }}</td>
+      <td>{{ r['emp_id'] }}</td>
+      <td>{{ r['date'] }}</td>
+      <td>{{ r['in_time'] }}</td>
+      <td>{{ r['out_time'] if r['out_time'] else '-' }}</td>
+      <td>
+        <form method="POST"
+              action="{{ url_for('delete_attendance', att_id=r['id']) }}"
+              onsubmit="return confirm('Delete this attendance entry?')">
+          <button class="btn danger" type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No records found</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
