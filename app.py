@@ -6,7 +6,7 @@ import uuid
 import pickle
 
 # ======================================================================
-# 🚨 FORCE TCP TRANSPORT FOR EZVIZ CCTV 
+# 🚨 FORCE TCP TRANSPORT FOR EZVIZ/HIKVISION CCTV 
 # ======================================================================
 os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;tcp|timeout;5000000"
 
@@ -37,12 +37,17 @@ SFACE_PATH = os.path.join(MODELS_DIR, "face_recognition_sface_2021dec.onnx")
 os.makedirs(EMP_DIR, exist_ok=True)
 os.makedirs(VISITOR_DIR, exist_ok=True)
 
+
 # =========================
 # CAMERA CONFIG 
 # =========================
-EZVIZ_IP = "10.196.209.3"
-IN_CAMERA  = f"rtsp://admin:BLYWTO@{EZVIZ_IP}:554/h264/ch1/main/av_stream"
-OUT_CAMERA = {"index": 2, "backend": cv2.CAP_MSMF}  # Camo Studio
+HIKVISION_IP = "192.168.3.11"
+
+# IN CAMERA (Channel 6 Main Stream - HD resolution for distant faces)
+IN_CAMERA  = f"rtsp://admin:Leeniv%4012@{HIKVISION_IP}:554/Streaming/Channels/601"
+
+# OUT CAMERA (Channel 10 Sub Stream)
+OUT_CAMERA = f"rtsp://admin:Leeniv%4012@{HIKVISION_IP}:554/Streaming/Channels/1002"
 
 # =========================
 # ACCURACY & STABILITY CONFIG
@@ -143,35 +148,44 @@ class ThreadedCameraStream:
         self.running = False
 
 # =========================
-# PHOTO CAPTURE HELPER
+# PHOTO CAPTURE HELPER (LAPTOP WEBCAM ONLY)
 # =========================
 def capture_face_photo(save_path):
     cap = None
-    window = "Capture Photo | S=Save | Q=Cancel"
+    window = "Capture Employee Photo | S=Save | Q=Cancel"
     captured = False
     last_frame = None
 
     try:
-        for cfg, name in [(OUT_CAMERA, "Camo Phone"), (IN_CAMERA, "EZVIZ Camera")]:
-            if isinstance(cfg, str):
-                cap = cv2.VideoCapture(cfg, cv2.CAP_FFMPEG)
+        # Connect specifically to the built-in Laptop Webcam (Index 0)
+        for backend in [cv2.CAP_DSHOW, cv2.CAP_MSMF, None]:
+            if backend is not None:
+                cap = cv2.VideoCapture(0, backend)
             else:
-                cap = cv2.VideoCapture(cfg["index"], cfg["backend"])
+                cap = cv2.VideoCapture(0)
+                
             if cap and cap.isOpened():
-                break
+                ret, test_frame = cap.read()
+                if ret and test_frame is not None:
+                    break
+                cap.release()
+                cap = None
 
         if cap is None or not cap.isOpened():
-            return False, "No camera available."
+            return False, "Laptop webcam (Index 0) could not be opened."
 
-        print("📸 Capture window opened. Press S to save, Q to cancel.")
+        print("📸 Laptop Webcam opened. Press S to save photo, Q to cancel.")
         while True:
             ret, frame = cap.read()
-            if not ret or frame is None: continue
+            if not ret or frame is None: 
+                continue
 
             last_frame = frame.copy()
             preview = frame.copy()
-            cv2.putText(preview, "Press S to SAVE | Q to CANCEL", (20, 40),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+            
+            # Onscreen instructions overlay
+            cv2.putText(preview, "ALIGN FACE - Press S to SAVE | Q to CANCEL", (20, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
             cv2.imshow(window, preview)
 
             key = cv2.waitKey(1) & 0xFF
@@ -181,23 +195,30 @@ def capture_face_photo(save_path):
                     cv2.imwrite(save_path, last_frame)
                     captured = True
                 break
-            if key in (ord("q"), ord("Q"), 27): break
+            if key in (ord("q"), ord("Q"), 27): 
+                break
     except Exception as e:
         return False, f"Capture failed: {e}"
     finally:
-        if cap is not None: cap.release()
-        try: cv2.destroyWindow(window)
-        except: pass
+        if cap is not None: 
+            cap.release()
+        try: 
+            cv2.destroyWindow(window)
+        except: 
+            pass
         cv2.destroyAllWindows()
-        for _ in range(5): cv2.waitKey(1)
+        for _ in range(5): 
+            cv2.waitKey(1)
 
-    if captured: return True, "Photo captured successfully"
+    if captured: 
+        return True, "Photo captured successfully"
     return False, "Capture cancelled"
 
 # =========================
 # FACE MODELS
 # =========================
 def load_detector_recognizer():
+    # Lowered score_threshold from 0.5 to 0.35 for far-away / angled faces
     detector = cv2.FaceDetectorYN.create(YUNET_PATH, "", (320, 320), 0.5, 0.3, 5000)
     recognizer = cv2.FaceRecognizerSF.create(SFACE_PATH, "")
     return detector, recognizer
@@ -333,7 +354,7 @@ def process_frame(frame, direction, known, detector, recognizer, stable_frame_tr
     if faces is not None:
         for face in faces:
             x, y, fw, fh = map(int, face[:4])
-            if fw < 35 or fh < 35: continue
+            if fw < 15 or fh < 15: continue
 
             aligned = recognizer.alignCrop(frame, face)
             feature = recognizer.feature(aligned)
