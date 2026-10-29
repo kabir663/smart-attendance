@@ -3,3 +3,7 @@ opencv-python
 numpy
 requests
 Pillow
+
+env=(Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned) ; (& d:\smart-attendance\venv\Scripts\Activate.ps1)
+
+activate=python app.py
